@@ -17,7 +17,7 @@ public class Bat {
     //Constructor
     Bat(int sx, int sy){
         mScreenX = sx;
-        mLength = mScreenX / 5;
+        mLength = mScreenX / 8;
         float height = sy / 40;
         mXCoord = mScreenX / 2;
         float mYCoord = sy - height;

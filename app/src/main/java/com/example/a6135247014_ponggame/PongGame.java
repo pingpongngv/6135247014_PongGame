@@ -141,7 +141,7 @@ public class PongGame extends SurfaceView implements Runnable {
         if(RectF.intersects(mBat.getRect(),mBall.getRect())) {
 
             mBall.batBounce(mBat.getRect());
-            //mBall.increaseVelocity();
+            mBall.increaseVelocity();
             if(y < x2 && y > x1)
             {
                 mScore = mScore + 20;
@@ -173,8 +173,8 @@ public class PongGame extends SurfaceView implements Runnable {
         // Right
         if(mBall.getRect().right > mScreenX){
             mBall.reverseXVelocity();
-            //mScore -= 5;
-            //mBall.increaseVelocity();
+            mScore -= 5;
+            mBall.increaseVelocity();
         }
 
     }
