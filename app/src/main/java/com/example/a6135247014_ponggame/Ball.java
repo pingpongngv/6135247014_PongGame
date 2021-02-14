@@ -11,8 +11,8 @@ public class Ball {
     private float mBallHeight;
 
     Ball(int screenX){
-        mBallWidth = screenX / 50;
-        mBallHeight = screenX / 50;
+        mBallWidth = screenX / 100;
+        mBallHeight = screenX / 100;
 
         mRect = new RectF();
     }

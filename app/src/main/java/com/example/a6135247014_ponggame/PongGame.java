@@ -7,6 +7,8 @@ import android.graphics.Paint;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.MotionEvent;
+import android.graphics.RectF;
 
 public class PongGame extends SurfaceView implements Runnable {
 
@@ -48,6 +50,7 @@ public class PongGame extends SurfaceView implements Runnable {
         mOurHolder = getHolder();
         mPaint = new Paint();
         mBall = new Ball(mScreenX);
+        mBat = new Bat(mScreenX, mScreenY);
         startNewGame();
     }
 
@@ -64,6 +67,7 @@ public class PongGame extends SurfaceView implements Runnable {
                 mPaint.setColor(Color.argb(255, 255, 255, 255));
                 mPaint.setTextSize(mFontSize);
                 mCanvas.drawRect(mBall.getRect(), mPaint);
+                mCanvas.drawRect(mBat.getRect(), mPaint);
                 mCanvas.drawText("Score: " + mScore + " Lives: " + mLives,
 
                         mFontMargin, mFontSize, mPaint);
@@ -99,12 +103,79 @@ public class PongGame extends SurfaceView implements Runnable {
             }
         }
     }
+    @Override
+    public boolean onTouchEvent(MotionEvent motionEvent) {
+        switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
+            case MotionEvent.ACTION_DOWN:
+                mPaused = false;
+                if(motionEvent.getX() > mScreenX / 2){
+                    mBat.setMovementState(mBat.RIGHT);
+                }
+                else{
+                    mBat.setMovementState(mBat.LEFT);
+                }
+                break;
+            case MotionEvent.ACTION_UP:
+                mBat.setMovementState(mBat.STOPPED);
+                break;
+        }
+        return true;
+    }
 
     private void update() {
         mBall.update(mFPS);
+        mBat.update(mFPS);
     }
 
     private void detectCollisions() {
+        float abat = mBat.getRect().left;
+        float bbat = mBat.getRect().right;
+        float aball = mBall.getRect().left;
+        float bball = mBall.getRect().right;
+
+        float cbat = (bbat - abat)/4;
+        float x1 = abat + cbat;
+        float x2 = abat + (3*cbat);
+        float y = (bball - aball)/2;
+
+        if(RectF.intersects(mBat.getRect(),mBall.getRect())) {
+
+            mBall.batBounce(mBat.getRect());
+            //mBall.increaseVelocity();
+            if(y < x2 && y > x1)
+            {
+                mScore = mScore + 20;
+            }
+            else
+            {
+                mScore = mScore + 10;
+            }
+
+        }
+
+        // Bottom
+        if(mBall.getRect().bottom > mScreenY){
+            mBall.reverseYVelocity();
+            mLives--;
+            if(mLives == 0){
+                mPaused = true;
+                startNewGame();
+            }
+        }
+        // Top
+        if(mBall.getRect().top < 0){
+            mBall.reverseYVelocity();
+        }
+        // Left
+        if(mBall.getRect().left < 0){
+            mBall.reverseXVelocity();
+        }
+        // Right
+        if(mBall.getRect().right > mScreenX){
+            mBall.reverseXVelocity();
+            //mScore -= 5;
+            //mBall.increaseVelocity();
+        }
 
     }
 
